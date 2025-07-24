@@ -41,3 +41,24 @@ jobs:
         with:
           name: app-release.apk
           path: cordova/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
+
+          # …antes você já tinha:
+- name: Instalar Cordova
+  run: npm install -g cordova
+
+# Logo em seguida, coloque:
+- name: Criar projeto Cordova
+  run: |
+    cordova create cordova com.jr.manutencao "Manutenção JR"
+    cp -R public/* cordova/www/
+
+# Depois continue com:
+- name: Preparar projeto Cordova
+  run: |
+    cd cordova
+    cordova platform add android
+
+- name: Build Android
+  run: |
+    cd cordova
+    cordova build android --release
