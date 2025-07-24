@@ -1,0 +1,43 @@
+name: Gerar APK
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Pega seu código
+      - uses: actions/checkout@v3
+
+      # 2) Instala o Node.js
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      # 3) Instala o Cordova (é aqui que ele “entra”)
+      - name: Instalar Cordova
+        run: npm install -g cordova
+
+      # 4) Vai para a pasta do seu app e prepara
+      - name: Preparar app Cordova
+        run: |
+          cd cordova
+          npm ci
+          cordova platform add android || echo "Já tem Android"
+
+      # 5) Faz o build do APK
+      - name: Build Android
+        run: |
+          cd cordova
+          cordova build android --release
+
+      # 6) Disponibiliza o APK para você baixar
+      - name: Publicar APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release.apk
+          path: cordova/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
